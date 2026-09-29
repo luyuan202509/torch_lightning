@@ -18,14 +18,18 @@ def main():
     argparser.add_argument("--lr",type=float,default=0.01)
     argparser.add_argument("--epochs",type=int,default=10)
     argparser.add_argument("--data_dir",type=str,default="../data")
-    argparser.add_argument("--device",type=str,default="cpu")
+    argparser.add_argument("--device",type=str,default="auto")
     args = argparser.parse_args()
 
 
     data_dir = args.data_dir
     lr = args.lr
     model = SimpleDenseNet()
-    device = torch.device(args.device)
+
+    device = args.device
+    if device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    device = torch.device(device)
 
     model = model.to(device)
     criterion = torch.nn.CrossEntropyLoss() # 损失函数
