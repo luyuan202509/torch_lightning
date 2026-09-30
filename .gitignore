@@ -214,3 +214,4 @@ pyrightconfig.json
 /.ipynb_checkpoints
 .idea/
 lightning_logs/
+checkpoints/
