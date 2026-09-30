@@ -161,15 +161,15 @@ if __name__ == "__main__":
     #tensorboard 记录训练日志，命令行查看：tensorboard --logdir /Users/luyuan/neulife/pyproject/torch_lightning/modles/tensorBordLogs
     logger = TensorBoardLogger("tensorBordLogs",name="mnist")
 
-    trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=logger)
+    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,logger=logger)
 
-    # print("开始训练。。。")
-    # trainer.fit(model=model, datamodule=datamodule)
+    print("开始训练。。。")
+    trainer.fit(model=model, datamodule=datamodule,ckpt_path="/Users/luyuan/neulife/pyproject/torch_lightning/modles/mnist/0y5njo13/checkpoints/epoch=1-step=1500.ckpt")
 
     # print("开始验证。。。")
     # trainer.validate(model=model,datamodule = datamodule)
 
-    checkpoint_path = "/Users/luyuan/neulife/pyproject/torch_lightning/modles/lightning_logs/version_0/checkpoints/epoch=4-step=3750.ckpt"
-    model = MNISTModule.load_from_checkpoint(checkpoint_path)
-    print("开始测试。。。")
-    trainer.test(model=model, datamodule=datamodule)
+    # checkpoint_path = "/Users/luyuan/neulife/pyproject/torch_lightning/modles/lightning_logs/version_0/checkpoints/epoch=4-step=3750.ckpt"
+    # model = MNISTModule.load_from_checkpoint(checkpoint_path)
+    # print("开始测试。。。")
+    # trainer.test(model=model, datamodule=datamodule)
