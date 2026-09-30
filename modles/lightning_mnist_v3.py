@@ -14,10 +14,11 @@ from simple_dense_net import SimpleDenseNet
 
 
 class MNISTModule(LightningModule):
-    def __init__(self):
+    def __init__(self,name = 'Tom',age = 11):
         super().__init__()
         self.model = SimpleDenseNet()
         self.criterion = torch.nn.CrossEntropyLoss()
+        self.save_hyperparameters() # 保存模型超参,保存到hparams.yml文件
 
         # metrix
         self.train_acc = Accuracy(task="multiclass", num_classes=10)
@@ -147,8 +148,7 @@ if __name__ == "__main__":
     data_dir = "../data"
     model = MNISTModule()
     datamodule = MNISTDataModule("../data", 64)
-    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1)
-
+    trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=True)
 
     print("开始训练。。。")
     trainer.fit(model=model, datamodule=datamodule)
