@@ -212,3 +212,5 @@ pyrightconfig.json
 /data 
 /output
 /.ipynb_checkpoints
+.idea/
+lightning_logs/
