@@ -1,7 +1,8 @@
 """
--- 增加日志的控制
+-- tensorbord 日志记录 版本
 """
 import torch
+from lightning.pytorch.loggers import TensorBoardLogger, tensorboard
 from torchmetrics import Accuracy, MeanMetric, MaxMetric
 from torchvision.datasets import MNIST
 from torchvision.transforms import transforms
@@ -61,6 +62,15 @@ class MNISTModule(LightningModule):
 
         self.log("train/loss", self.train_loss, on_step=True, on_epoch=False, prog_bar=True)
         self.log("train/acc", self.train_acc, on_step=True, on_epoch=False, prog_bar=True)
+
+        self.log_dict(
+             dictionary={
+                "train/loss":self.train_loss,
+                "train/acc":self.train_acc,
+                 # 获取其他评测指标
+            }, on_step=True, on_epoch=False, prog_bar=True
+        )
+
         return loss
 
     def on_train_end(self) -> None:
@@ -145,13 +155,19 @@ class MNISTDataModule(LightningDataModule):
 
 
 if __name__ == "__main__":
-    data_dir = "../data"
     model = MNISTModule()
     datamodule = MNISTDataModule("../data", 64)
-    trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=True)
+
+    #tensorboard 记录训练日志，命令行查看：tensorboard --logdir /Users/luyuan/neulife/pyproject/torch_lightning/modles/tensorBordLogs
+    logger = TensorBoardLogger("tensorBordLogs",name="mnist")
+
+
+    trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=logger)
 
     print("开始训练。。。")
     trainer.fit(model=model, datamodule=datamodule)
+
+
     # print("开始验证。。。")
     # trainer.validate(model=model,datamodule = datamodule)
     # print("开始测试。。。")
