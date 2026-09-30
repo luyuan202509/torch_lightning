@@ -216,4 +216,4 @@ pyrightconfig.json
 lightning_logs/
 checkpoints/
 tensorBordLogs/
-wandbLogs/
+wandb/

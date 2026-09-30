@@ -2,7 +2,7 @@
 -- tensorbord 日志记录 版本
 """
 import torch
-from lightning.pytorch.loggers import TensorBoardLogger, tensorboard
+from lightning.pytorch.loggers import TensorBoardLogger, tensorboard,WandbLogger
 from torchmetrics import Accuracy, MeanMetric, MaxMetric
 from torchvision.datasets import MNIST
 from torchvision.transforms import transforms
@@ -110,7 +110,7 @@ class MNISTModule(LightningModule):
         self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=0.05)
         return optimizer
 
     # ============================================================
@@ -159,8 +159,10 @@ if __name__ == "__main__":
     datamodule = MNISTDataModule("../data", 64)
 
     #tensorboard 记录训练日志，命令行查看：tensorboard --logdir /Users/luyuan/neulife/pyproject/torch_lightning/modles/tensorBordLogs
-    logger = TensorBoardLogger("tensorBordLogs",name="mnist")
-
+    #logger = TensorBoardLogger("tensorBordLogs",name="mnist")
+    logger = WandbLogger(project="mnist", name="mnist-wandb-v1",log_model=True) #logger 参数,训练完 best checkpoint 自动上传到云端 Artifacts 面板
+    logger.watch(model, log="all")  # 网页上就能看到每层权重的梯度/参数直方图随训练的变化
+    # Initialize WandB logger if enabled
 
     trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=logger)
 
