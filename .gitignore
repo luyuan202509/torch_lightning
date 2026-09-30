@@ -215,3 +215,5 @@ pyrightconfig.json
 .idea/
 lightning_logs/
 checkpoints/
+tensorBordLogs/
+wandbLogs/
