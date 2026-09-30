@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 class SimpleDenseNet(nn.Module):
-    def __init__(self,input_size = 784,hidden_size=256,output_size=20) -> None:
+    def __init__(self,input_size = 784,hidden_size=256,output_size=10) -> None:
         super().__init__()
         self.model = nn.Sequential(
             nn.Linear(input_size,hidden_size),
