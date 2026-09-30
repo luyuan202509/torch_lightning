@@ -8,7 +8,7 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import transforms
 from torch.utils.data import Dataset, DataLoader, ConcatDataset, random_split
 
-from pytorch_lightning import LightningModule, LightningDataModule, Trainer
+from pytorch_lightning import LightningModule, LightningDataModule, Trainer, Callback
 from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 
 from simple_dense_net import SimpleDenseNet
@@ -154,6 +154,16 @@ class MNISTDataModule(LightningDataModule):
         pass
 
 
+class PrintHelloBeforeTrain(Callback):
+    def __init__(self):
+        super().__init__()
+
+    def on_fit_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+        print("你好。。。")
+
+    def on_train_epoch_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+        print("孙悟空...")
+
 if __name__ == "__main__":
     model = MNISTModule()
     datamodule = MNISTDataModule("../data", 64)
@@ -161,10 +171,12 @@ if __name__ == "__main__":
     #tensorboard 记录训练日志，命令行查看：tensorboard --logdir /Users/luyuan/neulife/pyproject/torch_lightning/modles/tensorBordLogs
     logger = TensorBoardLogger("tensorBordLogs",name="mnist")
 
-    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,logger=logger)
+    #trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,logger=logger)
+    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1, logger=logger,callbacks=[PrintHelloBeforeTrain()])
 
     print("开始训练。。。")
-    trainer.fit(model=model, datamodule=datamodule,ckpt_path="/Users/luyuan/neulife/pyproject/torch_lightning/modles/mnist/0y5njo13/checkpoints/epoch=1-step=1500.ckpt")
+    #trainer.fit(model=model, datamodule=datamodule,ckpt_path="/Users/luyuan/neulife/pyproject/torch_lightning/modles/mnist/0y5njo13/checkpoints/epoch=1-step=1500.ckpt")
+    trainer.fit(model=model, datamodule=datamodule)
 
     # print("开始验证。。。")
     # trainer.validate(model=model,datamodule = datamodule)
