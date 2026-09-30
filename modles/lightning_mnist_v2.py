@@ -150,11 +150,23 @@ if __name__ == "__main__":
     data_dir = "../data"
     model = MNISTModule()
     datamodule = MNISTDataModule("../data", 64)
-    trainer = Trainer(max_epochs=10, accelerator="mps", devices=1)
+    #trainer = Trainer(max_epochs=5, accelerator="mps", devices=1)
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1, enable_model_summary=False) # enable_model_summary 控制训练前对模型参数量，模型结构等总结日志打印信息
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,enable_progress_bar=True) # enable_progress_bar 训练进度条显示与否控制
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,num_sanity_val_steps=2) # num_sanity_val_steps 冒烟测试，先从从valid dataloader中取两个batch，前向传播测试
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,enable_checkpointing=False)  # enable_checkpointing 控制每次训练完成保存checkpoint
+    # trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,logger=False)  # logger 控制每次训练完是否保存 非控制台 文件格式日志内容
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,default_root_dir="../lightning_data")  # default_root_dir 控制训练checkpoint,日志等等保存路径
+
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1) # accelerator="mps", devices=1, 控制多卡训练，详见官网文档
+    #trainer = Trainer(max_epochs=2, accelerator="mps", devices=1,precision='32-true') # precision 控制训练权重参数精度
+    #trainer = Trainer(max_steps=2, accelerator="mps", devices=1) # max_steps 训练最大的步数，所有epoch步数 大于 这个最大步数时候会提前结束训练，优先级比epoch更高
+    #trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,check_val_every_n_epoch=2) # check_val_every_n_epoch 控制多少epoch训练完成进行验证
+    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,val_check_interval=500) # val_check_interval 控制多少 batch 训练完成进行验证
 
     print("开始训练。。。")
     trainer.fit(model=model, datamodule=datamodule)
-    print("开始验证。。。")
-    trainer.validate(model=model,datamodule = datamodule)
-    print("开始测试。。。")
-    trainer.test(model=model, datamodule=datamodule)
+    # print("开始验证。。。")
+    # trainer.validate(model=model,datamodule = datamodule)
+    # print("开始测试。。。")
+    # trainer.test(model=model, datamodule=datamodule)
