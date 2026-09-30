@@ -1,7 +1,10 @@
 """
 -- tensorbord 日志记录 版本
 """
+from typing import Any
+
 import torch
+from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger, tensorboard
 from torchmetrics import Accuracy, MeanMetric, MaxMetric
 from torchvision.datasets import MNIST
@@ -88,8 +91,8 @@ class MNISTModule(LightningModule):
         self.val_loss(loss)
         self.val_acc(predict, label)
 
-        self.log("val/loss", self.val_loss, on_step=True, on_epoch=False, prog_bar=True)
-        self.log("val/acc", self.val_acc, on_step=True, on_epoch=False, prog_bar=True)
+        self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
         return loss
 
     def on_validation_epoch_end(self) -> None:
@@ -119,6 +122,20 @@ class MNISTModule(LightningModule):
     # def train_dataloader(self) -> DataLoader:
     #     train_loader = DataLoader(self.dataset,batch_size=self.batch_size,shuffle=True)
     #     return train_loader
+
+    # ============================================================
+    # =================checkpoint 相关回调 ========================
+    # ============================================================
+
+    def on_save_checkpoint(self, checkpoint: dict[str, Any]) -> None:
+        checkpoint["姓名"]="张三"
+        checkpoint["年龄"]=25
+        print(checkpoint["姓名"])
+        print(checkpoint["年龄"])
+
+    def on_load_checkpoint(self, checkpoint: dict[str, Any]) -> None:
+        print(checkpoint["姓名"])
+        print(checkpoint["年龄"])
 
 
 class MNISTDataModule(LightningDataModule):
@@ -172,7 +189,21 @@ if __name__ == "__main__":
     logger = TensorBoardLogger("tensorBordLogs",name="mnist")
 
     #trainer = Trainer(max_epochs=5, accelerator="mps", devices=1,logger=logger)
-    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1, logger=logger,callbacks=[PrintHelloBeforeTrain()])
+    #trainer = Trainer(max_epochs=5, accelerator="mps", devices=1, logger=logger,callbacks=[PrintHelloBeforeTrain()])
+
+    #checkpoint_callback = ModelCheckpoint(save_top_k=2,monitor='epoch',mode="max")
+    #checkpoint_callback = ModelCheckpoint(save_top_k=2,monitor='epoch',mode="max",save_last=True,filename="sample-mnist-epoch{epoch:02d}-val_loss{val/loss:.2f}")
+    checkpoint_callback = ModelCheckpoint(save_top_k=2,
+                                          monitor='val/loss',
+                                          save_last=True,
+                                          mode='min',
+                                          filename="sample-mnist-epoch{epoch:02d}-{train/loss:.02f}-{val/acc:.02f}",
+                                          auto_insert_metric_name=False)
+
+    trainer = Trainer(max_epochs=5, accelerator="mps", devices=1, logger=logger,callbacks=[checkpoint_callback])
+
+
+
 
     print("开始训练。。。")
     #trainer.fit(model=model, datamodule=datamodule,ckpt_path="/Users/luyuan/neulife/pyproject/torch_lightning/modles/mnist/0y5njo13/checkpoints/epoch=1-step=1500.ckpt")
